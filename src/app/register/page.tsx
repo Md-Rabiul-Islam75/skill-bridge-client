@@ -2,7 +2,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { registerUser, saveCurrentUser } from "@/lib/authClient";
+import { getDashboardPath, registerUser, saveCurrentUser } from "@/lib/authClient";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -26,10 +26,12 @@ export default function RegisterPage() {
 
       if (result.data) {
         saveCurrentUser(result.data.user);
+        const user = result.data.user as { role?: string };
+        window.location.href = getDashboardPath(user.role);
+        return;
       }
 
       setStatus("success");
-      window.location.href = "/dashboard";
     } catch (err: any) {
       setError(err?.message || "Unexpected error");
       setStatus("error");
@@ -37,48 +39,50 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="p-8 mx-auto max-w-md">
-      <h1 className="text-3xl font-bold">Register</h1>
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-lg border p-6">
+    <main className="sb-page max-w-xl">
+      <h1 className="sb-title">Create your account</h1>
+      <p className="sb-subtitle">Choose your role and start your SkillBridge journey.</p>
+
+      <form onSubmit={handleSubmit} className="sb-card mt-6 space-y-4 p-6">
         <label className="block">
-          <span>Name</span>
+          <span className="text-sm font-medium">Name</span>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="sb-input mt-1"
             required
           />
         </label>
 
         <label className="block">
-          <span>Email</span>
+          <span className="text-sm font-medium">Email</span>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="sb-input mt-1"
             required
           />
         </label>
 
         <label className="block">
-          <span>Password</span>
+          <span className="text-sm font-medium">Password</span>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="sb-input mt-1"
             required
           />
         </label>
 
         <label className="block">
-          <span>Role</span>
+          <span className="text-sm font-medium">Role</span>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as "STUDENT" | "TUTOR")}
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="sb-select mt-1"
           >
             <option value="STUDENT">Student</option>
             <option value="TUTOR">Tutor</option>
@@ -87,7 +91,7 @@ export default function RegisterPage() {
 
         <button
           type="submit"
-          className="w-full rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+          className="sb-btn sb-btn-primary w-full"
           disabled={status === "loading"}
         >
           {status === "loading" ? "Registering..." : "Register"}

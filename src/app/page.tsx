@@ -11,62 +11,92 @@ const navLinks = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-white to-purple-100 text-zinc-900 dark:from-zinc-900 dark:via-zinc-950 dark:to-zinc-900">
-      <main className="mx-auto w-full max-w-6xl p-8">
-        <section className="rounded-3xl bg-white/90 p-10 shadow-xl backdrop-blur dark:bg-zinc-900/80">
-          <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-5xl font-extrabold text-slate-900 dark:text-slate-100">SkillBridge</h1>
-              <p className="mt-4 text-lg text-slate-700 dark:text-slate-300">
-                Connect with expert tutors, manage bookings, and grow your skills with role-based workflows.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-800 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-blue-400 dark:hover:bg-zinc-800"
-                >
-                  {link.label}
-                </Link>
-              ))}
+    <div className="sb-page">
+      <section className="sb-card sb-fade-up overflow-hidden p-8 sm:p-10">
+        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-center">
+          <div>
+            <p className="sb-chip w-fit">Trusted learning marketplace</p>
+            <h1 className="mt-4 text-5xl font-extrabold tracking-tight sm:text-6xl">Learn smarter with expert tutors.</h1>
+            <p className="mt-4 max-w-2xl text-base text-muted sm:text-lg">
+              SkillBridge connects students, tutors, and admins in one focused platform with fast booking, profile management, and role-based dashboards.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/tutors" className="sb-btn sb-btn-primary">Explore Tutors</Link>
+              <Link href="/register" className="sb-btn sb-btn-ghost">Create Account</Link>
             </div>
           </div>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            <article className="rounded-2xl bg-blue-500/10 p-5 shadow-sm border border-blue-100 dark:border-blue-900 dark:bg-blue-950/30">
-              <h3 className="font-semibold">Students</h3>
-              <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
-                Browse tutors, book sessions, review instructors, and access your learning dashboard.
-              </p>
-            </article>
-            <article className="rounded-2xl bg-emerald-500/10 p-5 shadow-sm border border-emerald-100 dark:border-emerald-900 dark:bg-emerald-950/30">
-              <h3 className="font-semibold">Tutors</h3>
-              <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
-                Create a profile, manage availability, and track your teaching sessions and earnings.
-              </p>
-            </article>
-            <article className="rounded-2xl bg-orange-500/10 p-5 shadow-sm border border-orange-100 dark:border-orange-900 dark:bg-orange-950/30">
-              <h3 className="font-semibold">Admins</h3>
-              <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
-                Oversee users/bookings/categories, moderate content, and inspect platform analytics.
-              </p>
-            </article>
+          <div className="grid gap-3">
+            {navLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="sb-panel px-4 py-3 text-sm font-semibold transition hover:border-brand hover:text-brand">
+                {link.label}
+              </Link>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="mt-10 rounded-2xl bg-white p-8 shadow-xl dark:bg-zinc-900">
-          <h2 className="text-2xl font-bold">Workflow</h2>
-          <ol className="mt-4 list-decimal space-y-3 pl-6 text-sm text-slate-700 dark:text-slate-300">
-            <li>Register as Student or Tutor (role selection in form).</li>
-            <li>Login and open dashboard for role-specific actions.</li>
-            <li>Student books tutors and leaves reviews.</li>
-            <li>Tutor sets availability and manages sessions.</li>
-            <li>Admin manages all users, bookings, and categories.</li>
-          </ol>
-        </section>
-      </main>
+      <section className="mt-8 grid gap-4 md:grid-cols-3">
+        <article className="sb-card p-5">
+          <h3 className="text-lg font-semibold">Students</h3>
+          <p className="mt-2 text-sm text-muted">Browse tutors, book sessions instantly, and track your full learning history.</p>
+        </article>
+        <article className="sb-card p-5">
+          <h3 className="text-lg font-semibold">Tutors</h3>
+          <p className="mt-2 text-sm text-muted">Manage your profile, set availability, and grow your teaching visibility.</p>
+        </article>
+        <article className="sb-card p-5">
+          <h3 className="text-lg font-semibold">Admins</h3>
+          <p className="mt-2 text-sm text-muted">Oversee platform health with user, category, and booking management tools.</p>
+        </article>
+      </section>
+
+      <section className="sb-card mt-8 p-7 sm:p-8">
+        <h2 className="text-2xl font-bold">Workflow</h2>
+        <ol className="mt-4 list-decimal space-y-2.5 pl-5 text-sm text-muted">
+          <li>Register as Student or Tutor and login.</li>
+          <li>Students browse tutors and book sessions.</li>
+          <li>Tutors set availability and manage sessions.</li>
+          <li>Students review completed sessions.</li>
+          <li>Admins supervise users, bookings, and categories.</li>
+        </ol>
+      </section>
+
+      <section className="sb-card mt-8 p-7 sm:p-8">
+        <h2 className="text-2xl font-bold">Quick Test Panel</h2>
+        <p className="mt-2 text-sm text-muted">Use these practical flows to verify each role quickly.</p>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <article className="sb-panel p-5">
+            <h3 className="text-lg font-semibold">Student</h3>
+            <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-muted">
+              <li>Register as Student from <Link href="/register" className="font-semibold text-brand hover:underline">Register</Link>.</li>
+              <li>Login from <Link href="/login" className="font-semibold text-brand hover:underline">Login</Link>.</li>
+              <li>Browse tutors from <Link href="/tutors" className="font-semibold text-brand hover:underline">Browse Tutors</Link>.</li>
+              <li>Book and track in <Link href="/dashboard/bookings" className="font-semibold text-brand hover:underline">My Bookings</Link>.</li>
+            </ol>
+          </article>
+
+          <article className="sb-panel p-5">
+            <h3 className="text-lg font-semibold">Tutor</h3>
+            <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-muted">
+              <li>Register as Tutor.</li>
+              <li>Complete <Link href="/tutor/profile" className="font-semibold text-brand hover:underline">Tutor Profile</Link>.</li>
+              <li>Set slots at <Link href="/tutor/availability" className="font-semibold text-brand hover:underline">Availability</Link>.</li>
+              <li>Use <Link href="/tutor/dashboard" className="font-semibold text-brand hover:underline">Tutor Dashboard</Link>.</li>
+            </ol>
+          </article>
+
+          <article className="sb-panel p-5">
+            <h3 className="text-lg font-semibold">Admin</h3>
+            <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-muted">
+              <li>Login with admin account.</li>
+              <li>Open <Link href="/admin" className="font-semibold text-brand hover:underline">Admin Dashboard</Link>.</li>
+              <li>Manage <Link href="/admin/users" className="font-semibold text-brand hover:underline">Users</Link> and <Link href="/admin/bookings" className="font-semibold text-brand hover:underline">Bookings</Link>.</li>
+            </ol>
+          </article>
+        </div>
+      </section>
     </div>
   );
 }

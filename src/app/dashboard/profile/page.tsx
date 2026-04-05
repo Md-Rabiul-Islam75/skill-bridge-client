@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
@@ -40,17 +40,17 @@ export default function StudentProfilePage() {
   };
 
   return (
-    <main className="p-8">
-      <h1 className="text-4xl font-bold">Profile</h1>
+    <main className="sb-page">
+      <h1 className="sb-title">Profile</h1>
       {loading && <p>Loading profile...</p>}
       {error && <p className="mt-2 text-red-600">{error}</p>}
 
       {!loading && profile && (
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4 rounded-xl border p-6 dark:border-zinc-700 dark:bg-zinc-900">
+        <form onSubmit={handleSubmit} className="sb-card mt-5 space-y-4 p-6">
           <label className="block">
-            <span>Name</span>
+            <span className="text-sm font-medium">Name</span>
             <input
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="sb-input mt-1"
               value={profile.name || ""}
               onChange={(e) => setProfile({ ...profile, name: e.target.value })}
               required
@@ -58,17 +58,17 @@ export default function StudentProfilePage() {
           </label>
 
           <label className="block">
-            <span>Email</span>
+            <span className="text-sm font-medium">Email</span>
             <input
               type="email"
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="sb-input mt-1"
               value={profile.email || ""}
               onChange={(e) => setProfile({ ...profile, email: e.target.value })}
               required
             />
           </label>
 
-          <button type="submit" className="rounded bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700" disabled={saving}>
+          <button type="submit" className="sb-btn sb-btn-primary" disabled={saving}>
             {saving ? "Saving..." : "Save profile"}
           </button>
 

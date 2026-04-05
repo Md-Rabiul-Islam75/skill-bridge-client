@@ -23,43 +23,49 @@ export default function TutorsPage() {
     getTutors()
       .then((res) => {
         if (!res.ok) throw new Error(res.error || "Could not load tutors");
-        setTutors(res.data?.tutors || []);
+        setTutors(res.data || []);
       })
       .catch((e) => setError((e as any).message || "Failed to load tutors"))
       .finally(() => setLoading(false));
   }, []);
 
   return (
-    <main className="p-8">
-      <h1 className="text-4xl font-bold">Browse Tutors</h1>
-      <p className="mt-2 text-slate-600 dark:text-slate-300">Find the best tutor by subject, rating, and price.</p>
+    <main className="sb-page">
+      <h1 className="sb-title">Browse Tutors</h1>
+      <p className="sb-subtitle">Find the best tutor by subject, rating, and price.</p>
 
       {loading && <p className="mt-5 text-sm">Loading tutors...</p>}
       {error && <p className="mt-5 text-sm text-red-600">{error}</p>}
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {(tutors.length > 0 ? tutors : new Array(3).fill(null)).map((tutor, idx) => (
-          <article key={tutor?.id ?? idx} className="rounded-xl border border-slate-200 p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-800">
+          <article key={tutor?.user?.id ?? idx} className="sb-card p-5">
             {tutor ? (
               <>
-                <h2 className="text-xl font-semibold">{tutor.name}</h2>
-                <p className="text-sm text-slate-600 dark:text-slate-300">Subject: {tutor.subject}</p>
-                <p className="text-sm">Rating: {tutor.rating || "—"}</p>
-                <p className="text-sm">Price: ${tutor.price || "—"}/hr</p>
-                <Link href={`/tutors/${tutor.id}`} className="mt-3 inline-block text-sm text-blue-600 hover:text-blue-700">
+                <h2 className="text-xl font-semibold">{tutor.user?.name || "Unnamed Tutor"}</h2>
+                <p className="mt-2 text-sm text-muted">
+                  Subject: {tutor.categories?.[0]?.name || "General"}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="sb-chip">Rating: {tutor.rating ?? "—"}</span>
+                  <span className="sb-chip">
+                    Price: {tutor.price == null || tutor.price === "" ? "Not set" : `$${tutor.price}/hr`}
+                  </span>
+                </div>
+                <Link href={`/tutors/${tutor.user?.id}`} className="mt-4 inline-flex text-sm font-semibold text-brand hover:underline">
                   View profile
                 </Link>
               </>
             ) : (
-              <div className="h-28 animate-pulse rounded bg-slate-200 dark:bg-zinc-700" />
+              <div className="h-28 animate-pulse rounded bg-border" />
             )}
           </article>
         ))}
       </div>
 
-      <section className="mt-8 rounded-xl bg-blue-50 p-4 dark:bg-blue-950/20">
-        <h2 className="font-semibold">Filter & sort</h2>
-        <p className="text-sm text-slate-600 dark:text-slate-300">Add filter controls here when API support is available.</p>
+      <section className="sb-panel mt-8 p-4">
+        <h2 className="font-semibold">Filter and sort</h2>
+        <p className="text-sm text-muted">You can add subject/rating/price controls here as soon as full API filter UI is wired.</p>
       </section>
     </main>
   );

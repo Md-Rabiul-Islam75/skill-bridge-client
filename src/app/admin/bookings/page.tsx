@@ -21,20 +21,20 @@ export default function AdminBookingsPage() {
   }, []);
 
   return (
-    <main className="p-8">
-      <h1 className="text-4xl font-bold">Manage Bookings</h1>
+    <main className="sb-page">
+      <h1 className="sb-title">Manage Bookings</h1>
       {loading && <p className="mt-4">Loading bookings...</p>}
       {error && <p className="mt-4 text-red-600">{error}</p>}
 
       <div className="mt-5 space-y-3">
         {bookings.map((b) => (
-          <article key={b.id} className="rounded-xl border p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-800">
-            <p className="font-semibold">{b.tutorName || "Tutor"} with {b.studentName || "Student"}</p>
-            <p className="text-sm">{new Date(b.date).toLocaleString()}</p>
+          <article key={b.id} className="sb-card p-4">
+            <p className="font-semibold">{b.tutor?.name || b.tutorName || "Tutor"} with {b.student?.name || b.studentName || "Student"}</p>
+            <p className="text-sm text-muted">{new Date(b.date).toLocaleString()}</p>
             <p className="text-sm">Status: {b.status}</p>
           </article>
         ))}
-        {!loading && bookings.length === 0 && <p className="text-slate-600">No bookings yet.</p>}
+        {!loading && bookings.length === 0 && <p className="text-muted">No bookings yet.</p>}
       </div>
     </main>
   );

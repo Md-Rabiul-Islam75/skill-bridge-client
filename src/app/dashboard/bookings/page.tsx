@@ -1,13 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { getBookings } from "@/lib/apiClient";
+import { getCurrentUser } from "@/lib/authClient";
+
+type CurrentUser = {
+  id?: string;
+  role?: string;
+  name?: string;
+};
 
 export default function StudentBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const currentUser = useMemo(() => getCurrentUser() as CurrentUser | null, []);
+  const isTutor = currentUser?.role === "TUTOR";
+
+  const now = Date.now();
+  const sortedBookings = [...bookings].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  const upcomingBookings = sortedBookings.filter((booking) => new Date(booking.date).getTime() >= now);
+  const pastBookings = sortedBookings.filter((booking) => new Date(booking.date).getTime() < now);
 
   useEffect(() => {
     setLoading(true);
@@ -21,22 +38,118 @@ export default function StudentBookingsPage() {
   }, []);
 
   return (
-    <main className="p-8">
-      <h1 className="text-4xl font-bold">My Bookings</h1>
-      {loading && <p className="mt-4">Loading bookings...</p>}
-      {error && <p className="mt-4 text-red-600">{error}</p>}
-      {!loading && !error && bookings.length === 0 && <p className="mt-4 text-slate-600">No bookings yet.</p>}
-
-      <div className="mt-5 space-y-4">
-        {bookings.map((b) => (
-          <article key={b.id} className="rounded-xl border p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-800">
-            <p className="text-lg font-semibold">{b.tutorName || "Tutor"}</p>
-            <p className="text-sm text-slate-500">Date: {new Date(b.date).toLocaleString()}</p>
-            <p className="text-sm">Status: {b.status || "pending"}</p>
-            <p className="text-sm">Notes: {b.notes || "—"}</p>
-          </article>
-        ))}
+    <main className="sb-page">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="sb-title">{isTutor ? "Tutor Bookings" : "My Bookings"}</h1>
+          <p className="sb-subtitle">
+            {isTutor
+              ? "Track student bookings received for your sessions."
+              : "Track upcoming sessions and review past bookings in one place."}
+          </p>
+        </div>
+        {isTutor ? (
+          <Link href="/tutor/bookings" className="sb-btn sb-btn-primary">
+            Open tutor bookings
+          </Link>
+        ) : (
+          <Link href="/tutors" className="sb-btn sb-btn-primary">
+            Book a tutor
+          </Link>
+        )}
       </div>
+
+      {loading && <p className="mt-5 text-sm text-muted">Loading bookings...</p>}
+      {error && <p className="mt-5 text-sm text-red-600">{error}</p>}
+
+      {!loading && !error && bookings.length === 0 && (
+        <section className="sb-card mt-6 p-6">
+          <h2 className="text-xl font-semibold">No bookings yet</h2>
+          <p className="mt-2 text-sm text-muted">
+            {isTutor
+              ? "When students book your available slots, they will appear here."
+              : "Pick a tutor, choose an available slot, and your sessions will appear here."}
+          </p>
+          {isTutor ? (
+            <Link href="/tutor/bookings" className="sb-btn sb-btn-ghost mt-4 w-fit">
+              Open tutor bookings
+            </Link>
+          ) : (
+            <Link href="/tutors" className="sb-btn sb-btn-ghost mt-4 w-fit">
+              Browse tutors
+            </Link>
+          )}
+        </section>
+      )}
+
+      {!loading && !error && bookings.length > 0 && (
+        <div className="mt-6 space-y-8">
+          <section>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold">{isTutor ? "Incoming" : "Upcoming"}</h2>
+              <span className="text-sm text-muted">{upcomingBookings.length} sessions</span>
+            </div>
+            <div className="space-y-3">
+              {upcomingBookings.length > 0 ? (
+                upcomingBookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+              ) : (
+                <p className="text-sm text-muted">No upcoming sessions.</p>
+              )}
+            </div>
+          </section>
+
+          <section>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold">Past</h2>
+              <span className="text-sm text-muted">{pastBookings.length} sessions</span>
+            </div>
+            <div className="space-y-3">
+              {pastBookings.length > 0 ? (
+                pastBookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+              ) : (
+                <p className="text-sm text-muted">No past sessions yet.</p>
+              )}
+            </div>
+          </section>
+        </div>
+      )}
     </main>
+  );
+}
+
+function BookingCard({ booking }: { booking: any }) {
+  const status = String(booking.status || "CONFIRMED").toUpperCase();
+  const statusClasses =
+    status === "COMPLETED"
+      ? "bg-emerald-100 text-emerald-800"
+      : status === "CANCELLED"
+        ? "bg-rose-100 text-rose-800"
+        : "bg-amber-100 text-amber-800";
+
+  return (
+    <article className="sb-card p-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-lg font-semibold">{booking.tutor?.name || booking.tutorName || "Tutor"}</p>
+          <p className="mt-1 text-sm text-muted">{new Date(booking.date).toLocaleString()}</p>
+        </div>
+
+        <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusClasses}`}>
+          {status}
+        </span>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div className="rounded border border-border bg-background/60 px-4 py-3">
+          <p className="text-xs uppercase tracking-wide text-muted">Notes</p>
+          <p className="mt-1 text-sm">{booking.notes || "—"}</p>
+        </div>
+
+        <div className="rounded border border-border bg-background/60 px-4 py-3">
+          <p className="text-xs uppercase tracking-wide text-muted">Tutor</p>
+          <p className="mt-1 text-sm">{booking.tutor?.email || "No tutor email available"}</p>
+        </div>
+      </div>
+    </article>
   );
 }

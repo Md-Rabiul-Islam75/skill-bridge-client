@@ -100,6 +100,17 @@ export function saveCurrentUser(user: unknown) {
   localStorage.setItem("skillbridge_user", JSON.stringify(user));
 }
 
+export function getDashboardPath(role?: string) {
+  switch (role) {
+    case "TUTOR":
+      return "/tutor/dashboard";
+    case "ADMIN":
+      return "/admin";
+    default:
+      return "/dashboard";
+  }
+}
+
 export function getCurrentUser(): unknown {
   if (typeof window === "undefined") return null;
   try {

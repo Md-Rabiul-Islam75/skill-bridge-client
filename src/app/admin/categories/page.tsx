@@ -31,8 +31,8 @@ export default function AdminCategoriesPage() {
   };
 
   return (
-    <main className="p-8">
-      <h1 className="text-4xl font-bold">Manage Categories</h1>
+    <main className="sb-page">
+      <h1 className="sb-title">Manage Categories</h1>
       {loading && <p className="mt-4">Loading categories...</p>}
       {error && <p className="mt-4 text-red-600">{error}</p>}
 
@@ -41,14 +41,14 @@ export default function AdminCategoriesPage() {
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
           placeholder="Add a new category"
-          className="w-full rounded border px-3 py-2"
+          className="sb-input"
         />
-        <button className="rounded bg-violet-600 px-4 py-2 text-white hover:bg-violet-700">Add</button>
+        <button className="sb-btn sb-btn-primary">Add</button>
       </form>
 
       <div className="mt-4 space-y-2">
         {categories.map((cat) => (
-          <div key={cat.id} className="rounded-lg border px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800">
+          <div key={cat.id} className="sb-panel px-3 py-2">
             {cat.name}
           </div>
         ))}
