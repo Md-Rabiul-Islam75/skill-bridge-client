@@ -10,6 +10,16 @@ type AvailabilitySlot = {
   endTime: string;
 };
 
+function formatTime(time: string) {
+  const [hours, minutes] = time.split(":");
+  const hourValue = Number(hours);
+  if (Number.isNaN(hourValue) || !minutes) return time;
+
+  const suffix = hourValue >= 12 ? "PM" : "AM";
+  const normalizedHour = hourValue % 12 || 12;
+  return `${normalizedHour}:${minutes} ${suffix}`;
+}
+
 export default function TutorAvailabilityPage() {
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [startDateTime, setStartDateTime] = useState("");
@@ -50,13 +60,19 @@ export default function TutorAvailabilityPage() {
     event.preventDefault();
     setError(null);
     setSuccess(null);
+
+    if (slots.length === 0) {
+      setError("Add at least one availability slot before saving.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const res = await updateTutorAvailability({ availabilities: slots });
       if (!res.ok) throw new Error(res.error || "Unable to save availability");
       setSuccess("Availability saved.");
-      // Refetch slots from server to ensure they're persisted
+      // Refetch slots from server to ensure they're persisted and rendered from DB
       await fetchSlots();
       // Clear the input fields
       setStartDateTime("");
@@ -136,16 +152,17 @@ export default function TutorAvailabilityPage() {
 
         {/* Display slots list */}
         <div>
-          <h3 className="mb-3 text-sm font-semibold">Availability Slots</h3>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold">Availability Slots</h3>
+            <span className="text-xs text-muted">{slots.length} saved</span>
+          </div>
           <div className="space-y-3">
             {slots.length > 0 ? (
               slots.map((slot, idx) => (
-                <div key={idx} className="flex items-center justify-between rounded border border-border bg-card px-4 py-3">
+                <div key={`${slot.day}-${slot.startTime}-${idx}`} className="flex items-center justify-between rounded border border-border bg-card px-4 py-3">
                   <div>
                     <p className="font-semibold text-foreground">{slot.day}</p>
-                    <p className="text-sm text-muted">
-                      {slot.startTime} → {slot.endTime}
-                    </p>
+                    <p className="text-sm text-muted">{formatTime(slot.startTime)} → {formatTime(slot.endTime)}</p>
                   </div>
                   <button type="button" onClick={() => removeSlot(idx)} className="text-sm font-semibold text-red-600 hover:text-red-700">
                     Remove
@@ -153,7 +170,7 @@ export default function TutorAvailabilityPage() {
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted">No slots added yet. Add one above to get started.</p>
+              <p className="text-sm text-muted">No saved slots yet. Add one above to get started.</p>
             )}
           </div>
         </div>

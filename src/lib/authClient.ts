@@ -47,7 +47,7 @@ async function safeFetch<T>(path: string, init: RequestInit = {}): Promise<Fetch
         status: response.status,
         ok: false,
         data: null,
-        error: json?.message || response.statusText || "Unknown error",
+        error: json?.message || json?.error || response.statusText || "Unknown error",
       };
     } catch (err: any) {
       if (attempt < maxRetries) {

@@ -1,15 +1,47 @@
-import Link from "next/link";
+"use client";
 
-const navLinks = [
-  { href: "/tutors", label: "Browse Tutors" },
-  { href: "/login", label: "Login" },
-  { href: "/register", label: "Register" },
-  { href: "/dashboard", label: "Student Dashboard" },
-  { href: "/tutor/dashboard", label: "Tutor Dashboard" },
-  { href: "/admin", label: "Admin Dashboard" },
-];
+import { useMemo } from "react";
+import Link from "next/link";
+import { getCurrentUser } from "@/lib/authClient";
+
+type AppRole = "STUDENT" | "TUTOR" | "ADMIN";
+
+type CurrentUser = {
+  role?: string;
+} | null;
+
+function normalizeRole(role?: string): AppRole | null {
+  if (role === "STUDENT" || role === "TUTOR" || role === "ADMIN") return role;
+  return null;
+}
 
 export default function Home() {
+  const user = useMemo(() => getCurrentUser() as CurrentUser, []);
+
+  const role = normalizeRole(user?.role);
+
+  const navLinks = useMemo(() => {
+    const common = [{ href: "/tutors", label: "Browse Tutors" }];
+
+    if (!role) {
+      return [
+        ...common,
+        { href: "/login", label: "Login" },
+        { href: "/register", label: "Register" },
+      ];
+    }
+
+    if (role === "STUDENT") {
+      return [...common, { href: "/dashboard", label: "Student Dashboard" }];
+    }
+
+    if (role === "TUTOR") {
+      return [{ href: "/tutor/dashboard", label: "Tutor Dashboard" }];
+    }
+
+    return [{ href: "/admin", label: "Admin Dashboard" }];
+  }, [role]);
+
   return (
     <div className="sb-page">
       <section className="sb-card sb-fade-up overflow-hidden p-8 sm:p-10">
@@ -22,7 +54,9 @@ export default function Home() {
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/tutors" className="sb-btn sb-btn-primary">Explore Tutors</Link>
-              <Link href="/register" className="sb-btn sb-btn-ghost">Create Account</Link>
+              {!role ? (
+                <Link href="/register" className="sb-btn sb-btn-ghost">Create Account</Link>
+              ) : null}
             </div>
           </div>
 

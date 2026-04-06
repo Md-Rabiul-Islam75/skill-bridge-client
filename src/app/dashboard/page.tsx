@@ -29,7 +29,7 @@ export default function StudentDashboardPage() {
           <li>Search tutors</li>
           <li>View profile and availability</li>
           <li>Book session and track in bookings page</li>
-          <li>Leave review after completion</li>
+          <li>Leave review from the tutor detail page after completion</li>
         </ol>
       </section>
     </main>

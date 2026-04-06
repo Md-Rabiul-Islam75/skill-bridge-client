@@ -57,6 +57,37 @@ export async function createBooking(payload: { tutorId: string; date: string; no
   });
 }
 
+export async function getTutorBookingsByTutorId(tutorId: string) {
+  const query = `?userId=${encodeURIComponent(tutorId)}&role=TUTOR`;
+  const result = await safeFetch<Array<any>>(`/api/bookings${query}`);
+  return {
+    ...result,
+    data: result.data ? { bookings: result.data } : null,
+  };
+}
+
+export async function createReview(payload: { bookingId: string; rating: number; comment?: string }) {
+  const currentUser = getCurrentUser() as { id?: string; role?: string } | null;
+  if (!currentUser?.id || currentUser?.role !== "STUDENT") {
+    return {
+      status: 401,
+      ok: false,
+      data: null,
+      error: "Student must be logged in to leave a review",
+    };
+  }
+
+  return safeFetch("/api/reviews", {
+    method: "POST",
+    body: JSON.stringify({
+      bookingId: payload.bookingId,
+      rating: payload.rating,
+      comment: payload.comment,
+      reviewerId: currentUser.id,
+    }),
+  });
+}
+
 export async function getMyProfile() {
   const currentUser = getCurrentUser() as { id?: string; role?: string } | null;
   

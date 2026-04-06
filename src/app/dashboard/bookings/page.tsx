@@ -45,7 +45,7 @@ export default function StudentBookingsPage() {
           <p className="sb-subtitle">
             {isTutor
               ? "Track student bookings received for your sessions."
-              : "Track upcoming sessions and review past bookings in one place."}
+              : "Track upcoming sessions, review past bookings, and leave feedback after completed sessions."}
           </p>
         </div>
         {isTutor ? (
@@ -53,9 +53,11 @@ export default function StudentBookingsPage() {
             Open tutor bookings
           </Link>
         ) : (
-          <Link href="/tutors" className="sb-btn sb-btn-primary">
-            Book a tutor
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/tutors" className="sb-btn sb-btn-primary">
+              Book a tutor
+            </Link>
+          </div>
         )}
       </div>
 
@@ -68,16 +70,18 @@ export default function StudentBookingsPage() {
           <p className="mt-2 text-sm text-muted">
             {isTutor
               ? "When students book your available slots, they will appear here."
-              : "Pick a tutor, choose an available slot, and your sessions will appear here."}
+              : "Pick a tutor, choose an available slot, and your sessions will appear here. After a session is completed, you can review it from the Reviews page."}
           </p>
           {isTutor ? (
             <Link href="/tutor/bookings" className="sb-btn sb-btn-ghost mt-4 w-fit">
               Open tutor bookings
             </Link>
           ) : (
-            <Link href="/tutors" className="sb-btn sb-btn-ghost mt-4 w-fit">
-              Browse tutors
-            </Link>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link href="/tutors" className="sb-btn sb-btn-ghost w-fit">
+                Browse tutors
+              </Link>
+            </div>
           )}
         </section>
       )}
