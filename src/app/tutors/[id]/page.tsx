@@ -3,7 +3,7 @@
 
 import { use, useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "@/lib/authClient";
-import { createBooking, createReview, getBookings, getTutorBookingsByTutorId, getTutorById } from "@/lib/apiClient";
+import { createBooking, createReview, getBookings, getTutorById } from "@/lib/apiClient";
 
 type CurrentUser = {
   id?: string;
@@ -17,7 +17,6 @@ export default function TutorProfilePage({ params }: { params: Promise<{ id: str
   const [loading, setLoading] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [reviewLoadingId, setReviewLoadingId] = useState<string | null>(null);
-  const [confirmedSlotTimes, setConfirmedSlotTimes] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
@@ -28,7 +27,15 @@ export default function TutorProfilePage({ params }: { params: Promise<{ id: str
   const selectedSlotLabel = date ? new Date(date).toLocaleString() : "No slot selected yet";
 
   const now = Date.now();
-  const confirmedSlotSet = useMemo(() => new Set(confirmedSlotTimes), [confirmedSlotTimes]);
+  const myConfirmedSlotSet = useMemo(
+    () =>
+      new Set(
+        bookings
+          .filter((booking) => booking.status === "CONFIRMED" || booking.status === "COMPLETED")
+          .map((booking) => new Date(booking.date).getTime())
+      ),
+    [bookings]
+  );
   const sortedBookings = [...bookings].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const upcomingBookings = sortedBookings.filter((booking) => new Date(booking.date).getTime() >= now);
   const pastBookings = sortedBookings.filter((booking) => new Date(booking.date).getTime() < now);
@@ -48,22 +55,12 @@ export default function TutorProfilePage({ params }: { params: Promise<{ id: str
     setBookings(tutorBookings);
   };
 
-  const fetchConfirmedSlots = async () => {
-    const tutorBookingsRes = await getTutorBookingsByTutorId(tutorId);
-    const blockedTimes = (tutorBookingsRes.data?.bookings || [])
-      .filter((booking: any) => booking.status === "CONFIRMED" || booking.status === "COMPLETED")
-      .map((booking: any) => new Date(booking.date).getTime());
-    setConfirmedSlotTimes(blockedTimes);
-  };
-
   useEffect(() => {
     setLoading(true);
-    Promise.all([getTutorById(tutorId), fetchConfirmedSlots()])
+    Promise.all([getTutorById(tutorId), fetchBookings()])
       .then(async ([tutorRes]) => {
         if (!tutorRes.ok) throw new Error(tutorRes.error || "Could not load tutor");
         setTutor(tutorRes.data || null);
-
-        await fetchBookings();
       })
       .catch((e) => setError((e as any).message || "Failed to load tutor"))
       .finally(() => setLoading(false));
@@ -89,7 +86,7 @@ export default function TutorProfilePage({ params }: { params: Promise<{ id: str
       setSuccess("Booking created successfully!");
       setDate("");
       setNotes("");
-      await Promise.all([fetchBookings(), fetchConfirmedSlots()]);
+      await fetchBookings();
     } catch (e: any) {
       setError(e.message || "Unable to book.");
     } finally {
@@ -204,7 +201,7 @@ export default function TutorProfilePage({ params }: { params: Promise<{ id: str
               {tutor.availabilities.map((slot: any) => {
                 const slotDateTime = `${slot.day}T${slot.startTime}`;
                 const slotTime = new Date(slotDateTime).getTime();
-                const isConfirmed = confirmedSlotSet.has(slotTime);
+                const isConfirmed = myConfirmedSlotSet.has(slotTime);
                 const selected = date === slotDateTime;
                 return (
                   <button
@@ -219,12 +216,12 @@ export default function TutorProfilePage({ params }: { params: Promise<{ id: str
                   >
                     <div>
                       <p className="font-semibold">{slot.day}</p>
-                      <p className="mt-1 text-sm text-muted">{isConfirmed ? "This slot is already confirmed." : "Select this time to prefill your booking."}</p>
+                      <p className="mt-1 text-sm text-muted">{isConfirmed ? "You already confirmed this slot." : "Select this time to prefill your booking."}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       {isConfirmed ? (
                         <span className="rounded-full border border-emerald-300 bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
-                          Confirmed
+                          Booked by you
                         </span>
                       ) : null}
                       <span className="rounded-full bg-background px-3 py-1 text-sm font-medium text-muted">
