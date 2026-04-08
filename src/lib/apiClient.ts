@@ -117,9 +117,20 @@ export async function getMyProfile() {
 }
 
 export async function updateProfile(payload: any) {
-  const currentUser = getCurrentUser() as { id?: string } | null;
+  const currentUser = getCurrentUser() as { id?: string; role?: string } | null;
   if (!currentUser?.id) {
     return { status: 401, ok: false, data: null, error: "User not signed in" };
+  }
+
+  if (currentUser.role !== "TUTOR") {
+    return safeFetch("/api/auth/profile", {
+      method: "PUT",
+      body: JSON.stringify({
+        userId: currentUser.id,
+        name: payload.name,
+        email: payload.email,
+      }),
+    });
   }
 
   const normalizedPrice =
